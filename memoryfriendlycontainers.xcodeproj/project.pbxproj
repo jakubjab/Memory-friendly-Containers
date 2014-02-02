@@ -25,6 +25,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2193916F189EEA8C004D34AE /* mfvector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mfvector.h; sourceTree = "<group>"; usesTabs = 0; wrapsLines = 0; };
 		2194F811189EE2BA00EFA84F /* mfunorderedmap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mfunorderedmap.h; sourceTree = "<group>"; };
 		21B903FE189ED6D800F9D4F8 /* memoryfriendlycontainers */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = memoryfriendlycontainers; sourceTree = BUILT_PRODUCTS_DIR; };
 		21B90401189ED6D800F9D4F8 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -64,6 +65,7 @@
 				21B90401189ED6D800F9D4F8 /* main.cpp */,
 				21B90403189ED6D800F9D4F8 /* memoryfriendlycontainers.1 */,
 				2194F811189EE2BA00EFA84F /* mfunorderedmap.h */,
+				2193916F189EEA8C004D34AE /* mfvector.h */,
 			);
 			path = memoryfriendlycontainers;
 			sourceTree = "<group>";
