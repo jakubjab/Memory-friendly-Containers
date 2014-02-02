@@ -19,13 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include <iostream>
+#ifndef memoryfriendlycontainers_mfunorderedmap_h
+#define memoryfriendlycontainers_mfunorderedmap_h
 
-int main(int argc, const char * argv[])
-{
 
-    // insert code here...
-    std::cout << "Hello World!\n";
-    return 0;
-}
-
+#endif
