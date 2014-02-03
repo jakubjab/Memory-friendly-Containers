@@ -19,27 +19,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include <cassert>
 #include <iostream>
+#include <iterator>
+#include <ostream>
+#include <vector>
 #include <type_traits>
 
 #include "mfvector.h"
-#include "mfunorderedmap.h"
 #include "object.h"
 
-template<typename T>
-void type_size_alignment(const char *n)
+int main_evector_test()
 {
-	std::cout << "sizeof/alignment of " << n << ": " << sizeof(T) << " / "
-    << std::alignment_of<T>::value << std::endl;
-}
+	evector<object> v1;
+	assert(v1.size() == 0);
+	assert(v1.capacity() == 0);
+	assert(v1.begin() == v1.end());
 
-int main_evector_test(void);
-int main_ehashmap_test(void);
+	evector<object> v2(4);
+	assert(v2.size() == 0);
+	assert(v2.capacity() == 4);
+	assert(v2.begin() == v2.end());
 
-int main()
-{
-    main_evector_test();
-	//main_ehashmap_test();
-    
+	v2.push_back(object("a"));
+	assert(v2.size() == 1);
+	assert(v2.capacity() == 4);
+	assert((v2.begin() + 1) == v2.end());
+
 	return 0;
 }

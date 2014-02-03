@@ -19,27 +19,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+
+#include <cassert>
 #include <iostream>
+#include <iterator>
+#include <ostream>
+#include <vector>
 #include <type_traits>
 
-#include "mfvector.h"
 #include "mfunorderedmap.h"
 #include "object.h"
 
-template<typename T>
-void type_size_alignment(const char *n)
+int main_ehashmap_test(void)
 {
-	std::cout << "sizeof/alignment of " << n << ": " << sizeof(T) << " / "
-    << std::alignment_of<T>::value << std::endl;
-}
+	mfunorderedmap<int, object> m1(4);
 
-int main_evector_test(void);
-int main_ehashmap_test(void);
+	m1.insert(100, object("a"));
+	m1.insert(200, object("a"));
+	m1.insert(300, object("a"));
+	m1.insert(400, object("a"));
 
-int main()
-{
-    main_evector_test();
-	//main_ehashmap_test();
-    
 	return 0;
 }

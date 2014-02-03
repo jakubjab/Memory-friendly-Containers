@@ -25,10 +25,11 @@
 
 #include <algorithm>
 #include <cstddef>
-//#include <purify.h>
 #include <type_traits>
 
 #include <ostream>
+
+#include "purify.h"
 
 template<typename T> class evector;
 template<typename T> std::ostream& operator<<(std::ostream&,

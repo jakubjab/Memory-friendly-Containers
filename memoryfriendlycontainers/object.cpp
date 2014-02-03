@@ -19,27 +19,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include <iostream>
-#include <type_traits>
-
-#include "mfvector.h"
-#include "mfunorderedmap.h"
 #include "object.h"
 
-template<typename T>
-void type_size_alignment(const char *n)
+std::ostream& operator<<(std::ostream& o, const object& x)
 {
-	std::cout << "sizeof/alignment of " << n << ": " << sizeof(T) << " / "
-    << std::alignment_of<T>::value << std::endl;
-}
-
-int main_evector_test(void);
-int main_ehashmap_test(void);
-
-int main()
-{
-    main_evector_test();
-	//main_ehashmap_test();
-    
-	return 0;
+	o << "object " << std::hex << (void *) &x;
+	o << std::dec << " " << x.name;
+	return o;
 }

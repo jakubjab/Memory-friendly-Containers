@@ -19,27 +19,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include <iostream>
-#include <type_traits>
 
-#include "mfvector.h"
-#include "mfunorderedmap.h"
-#include "object.h"
 
-template<typename T>
-void type_size_alignment(const char *n)
+#ifndef memoryfriendlycontainers_purify_h
+#define memoryfriendlycontainers_purify_h
+
+#ifdef __cplusplus
+extern "C"
 {
-	std::cout << "sizeof/alignment of " << n << ": " << sizeof(T) << " / "
-    << std::alignment_of<T>::value << std::endl;
-}
+#endif
 
-int main_evector_test(void);
-int main_ehashmap_test(void);
+    int purify_watch_n(char *, unsigned int, char *);
+    void purify_watch_remove(int);
 
-int main()
-{
-    main_evector_test();
-	//main_ehashmap_test();
-    
-	return 0;
+#ifdef __cplusplus
 }
+#endif
+
+#endif
