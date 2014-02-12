@@ -20,11 +20,13 @@
 // THE SOFTWARE.
 
 #include <iostream>
+#include <vector>
 #include <type_traits>
 
 #include "mfvector.h"
 #include "mfunorderedmap.h"
 #include "object.h"
+#include "gtest/gtest.h"
 
 template<typename T>
 void type_size_alignment(const char *n)
@@ -36,10 +38,35 @@ void type_size_alignment(const char *n)
 int main_evector_test(void);
 int main_ehashmap_test(void);
 
-int main()
+
+class Arena {
+    void* p;
+    int s;
+public:
+    Arena(void* pp, int ss) : p(pp), s(ss)
+    {}
+};
+
+template<class T> struct My_alloc {
+    Arena& a;
+    My_alloc(Arena& aa) : a(aa) { }
+    // usual allocator stuff
+};
+
+
+int main(int argc, char **argv)
 {
-    main_evector_test();
-	//main_ehashmap_test();
+    Arena my_arena1(new char[100000],100000);
+    Arena my_arena2(new char[1000000],1000000);
+
+//    std::vector<int,My_alloc<int>> v1(My_alloc<int>{my_arena1});
     
-	return 0;
+    
+    
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+    
+//    main_evector_test();
+//	main_ehashmap_test();
+//	return 0;
 }

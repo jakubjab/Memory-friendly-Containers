@@ -55,7 +55,7 @@ public:
 			capacity_ = org.capacity_;
 			if (capacity_) {
 				data_ = (T*) (new uninitialized_T[capacity_]);
-				std::uninitialized_copy_n(org.data_, size_, data_);
+				std::uninitialized_copy(org.data_, size_, data_);
 			} else {
 				data_ = 0;
 			}
@@ -147,7 +147,7 @@ public:
 		{
 			stop_watch();
 			std::cout << "evector::push_back(T&& x), adding at " << &data_[size_] << "-----------------------\n";
-			new (&data_[size_++]) T(std::move(x));
+//			new (&data_[size_++]) T(std::move(x));
 			start_watch();
 		}
 	}
@@ -186,13 +186,13 @@ public:
 	T* erase(T const* first, T const* last)
 	{
 		stop_watch();
-		//std::move(last, end(), first);
-		T * i = const_cast<T*>(first);
-		T * j = const_cast<T*>(last);
-		T * e = const_cast<T*>(end());
+//		std::move(last, end(), first);
+		T* i = const_cast<T*>(first);
+		T* j = const_cast<T*>(last);
+		T* e = const_cast<T*>(end());
 		while (j != end())
 		{
-			*i++ = std::move(*j++);
+//			*i++ = std::move(*j++);
 		}
 		while (i != e)
 		{
@@ -277,7 +277,7 @@ std::ostream& operator<<(std::ostream& o, const evector<T>& v)
 	o << std::dec << "evector at " << std::hex << (void *) &v << std::dec
     << "(size " << v.size_ << ", capacity " << v.capacity_ << ", data "
     << std::hex << v.data_ << " [" << std::dec;
-	std::copy(v.begin(), v.end(), std::ostream_iterator<T>(o, ", "));
+//	std::copy(v.begin(), v.end(), std::ostream_iterator<T>(o, ", "));
 	o << "]," << " watch " << v.watch << ")";
     
 	return o;

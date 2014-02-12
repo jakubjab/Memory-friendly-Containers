@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		216A139518A2D5EB00C7E518 /* gtest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 216A139418A2D5EB00C7E518 /* gtest.framework */; };
 		21B90402189ED6D800F9D4F8 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21B90401189ED6D800F9D4F8 /* main.cpp */; };
 		21B90404189ED6D800F9D4F8 /* memoryfriendlycontainers.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 21B90403189ED6D800F9D4F8 /* memoryfriendlycontainers.1 */; };
 		21C1C1B318A027E300227267 /* ehashmap_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21C1C1B218A027E300227267 /* ehashmap_test.cpp */; };
@@ -29,10 +30,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		216A139418A2D5EB00C7E518 /* gtest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = gtest.framework; path = ../../googletest/fw/gtest.framework; sourceTree = "<group>"; };
 		2193916F189EEA8C004D34AE /* mfvector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mfvector.h; sourceTree = "<group>"; usesTabs = 0; wrapsLines = 0; };
 		2194F811189EE2BA00EFA84F /* mfunorderedmap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mfunorderedmap.h; sourceTree = "<group>"; };
 		21B903FE189ED6D800F9D4F8 /* memoryfriendlycontainers */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = memoryfriendlycontainers; sourceTree = BUILT_PRODUCTS_DIR; };
-		21B90401189ED6D800F9D4F8 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		21B90401189ED6D800F9D4F8 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		21B90403189ED6D800F9D4F8 /* memoryfriendlycontainers.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = memoryfriendlycontainers.1; sourceTree = "<group>"; };
 		21C1C1B118A026C900227267 /* object.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = object.h; sourceTree = "<group>"; };
 		21C1C1B218A027E300227267 /* ehashmap_test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ehashmap_test.cpp; sourceTree = "<group>"; };
@@ -47,6 +49,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				216A139518A2D5EB00C7E518 /* gtest.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -56,6 +59,7 @@
 		21B903F5189ED6D800F9D4F8 = {
 			isa = PBXGroup;
 			children = (
+				216A139418A2D5EB00C7E518 /* gtest.framework */,
 				21B90400189ED6D800F9D4F8 /* memoryfriendlycontainers */,
 				21B903FF189ED6D800F9D4F8 /* Products */,
 			);
@@ -219,6 +223,12 @@
 		21B90408189ED6D800F9D4F8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/jakubjab/Projects/googletest/fw,
+				);
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -226,6 +236,12 @@
 		21B90409189ED6D800F9D4F8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/jakubjab/Projects/googletest/fw,
+				);
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

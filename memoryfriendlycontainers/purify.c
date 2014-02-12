@@ -21,7 +21,7 @@
 
 #include "purify.h"
 
-int purify_watch_n(char *a, unsigned int b, char *c)
+int purify_watch_n(char *a, size_t b, char *c)
 {
     return 0;
 }

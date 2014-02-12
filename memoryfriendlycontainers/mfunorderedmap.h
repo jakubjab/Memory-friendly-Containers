@@ -26,22 +26,23 @@
 #include <algorithm>
 #include <cstddef>
 #include <functional>
-//#include <purify.h>
+#include "purify.h"
 #include <type_traits>
-
+#include <iterator>
 #include <ostream>
 
-template<typename K, typename T> class ehashmap;
-template<typename K, typename T> std::ostream& operator<<(std::ostream&, const ehashmap<K, T>& v);
+template<typename K, typename V> class ehashmap;
+template<typename K, typename V> std::ostream& operator<<(std::ostream&,
+                                                          const ehashmap<K, V>& v);
 
-template<typename T>
+template<typename V>
 struct ehash
 {
 	std::size_t mask;
     
-	std::size_t operator()(T key)
+	std::size_t operator()(V key)
 	{
-		return std::hash<T>(key) & mask;
+		return std::hash<V>(key) & mask;
 	}
 };
 
@@ -65,56 +66,118 @@ struct ehash<int>
 	}
 };
 
-template<typename K, typename T>
-class mfunorderedmap {
-	friend std::ostream& operator<<<K, T> (std::ostream& o, const ehashmap<K, T>& v);
+template<typename K, typename V>
+class ehashmap
+{
+	friend std::ostream& operator<<<K, V> (std::ostream& o,
+                                           const ehashmap<K, V>& v);
     
-	typedef std::pair<K, T> entry_t;
-	typedef std::pair<K, T*> bucket_t;
+public:
+	typedef K key_type;
+	typedef std::pair<const K, V> value_type;
+	typedef V mapped_type;
+	typedef std::size_t size_type;
+    
+	struct entry_t
+	{
+		value_type value;
+		entry_t* next_entry;
+        
+		entry_t(const K& key, const V& v, entry_t* next_entry) : value(key, v), next_entry(next_entry)
+		{}
+	};
+    
+	struct bucket_t
+	{
+		entry_t* first_entry;
+        
+		bucket_t() : first_entry(0)
+		{}
+	};
+    
+	class iterator: public std::iterator<std::forward_iterator_tag, value_type>
+	{
+		value_type* operator->() const
+		{
+			return entry->value;
+		}
+        
+		iterator& operator++()
+		{
+			if (entry->next_entry)
+			{
+				entry = entry->next_entry;
+			}
+			else
+			{
+				while (++bucketIx < map->hashsize_)
+				{
+					entry = map->buckets_[bucketIx].first_entry;
+				}
+			}
+            
+			return *this;
+		}
+        
+	private:
+		ehashmap* map;
+		std::size_t bucketIx;
+		entry_t* entry;
+	};
+    
+    
+	//	typedef iterator iterator;
+	//	typedef implementation-defined const_iterator;
+	//	typedef implementation-defined local_iterator;
+	//	typedef implementation-defined const_local_iterator;
+    
 	typedef typename std::aligned_storage<sizeof(entry_t),
     std::alignment_of<entry_t>::value>::type uninitialized_entry;
 	typedef typename std::aligned_storage<sizeof(bucket_t),
     std::alignment_of<bucket_t>::value>::type uninitialized_bucket;
     
 public:
-	explicit mfunorderedmap(size_t capacity = 0)
+	V empty;
+    
+	explicit ehashmap(size_t capacity = 0)
 	{
 		init(capacity);
 		std::cout << this << ": constructor" << std::endl;
 	}
     
-	mfunorderedmap(const mfunorderedmap& org)
+	ehashmap(const ehashmap& org)
 	{
-		if (&org != this) {
+		if (&org != this)
+		{
 			size_ = org.size_;
 			capacity_ = org.capacity_;
 		}
 		std::cout << this << ": copy constructor from " << (&org) << std::endl;
 	}
     
-	mfunorderedmap(mfunorderedmap&& org)
+	ehashmap(ehashmap&& org)
 	{
 		init();
-		swap_unwatched(org);
+		swap(org);
 		std::cout << this << ": move constructor from " << (&org) << std::endl;
 	}
     
-	mfunorderedmap& operator=(const mfunorderedmap& org)
+	ehashmap& operator=(const ehashmap& org)
 	{
-		mfunorderedmap tmp(org);
-		swap_unwatched(tmp);
+		ehashmap tmp(org);
+		swap(tmp);
 		std::cout << this << ": copy assignment" << std::endl;
 		return *this;
 	}
     
-	mfunorderedmap& operator=(mfunorderedmap&& org)
+	ehashmap& operator=(ehashmap&& org)
 	{
-		swap_unwatched(org);
+		swap(org);
 		std::cout << this << ": move assignment from " << (&org) << std::endl;
 		return *this;
 	}
     
-	~mfunorderedmap()
+	~ehashmap()
 	{
 		std::cout << this << ": destructor" << std::endl;
 		destroy();
@@ -130,16 +193,42 @@ public:
 		return size_;
 	}
     
-	void insert(K key, T value)
+	V& operator[](const K& key)
 	{
-		std::size_t hashkey = hash_fn(key);
-		std::cout << this << ": insert of key " << key << ", hashkey " << hashkey << std::endl;
-        
-        
+		std::size_t keyhash = hash_fn(key);
+		for (entry_t* e = buckets_[keyhash].first_entry; e; e = e->next_entry)
+		{
+			if (e->value.first == key)
+			{
+				return e->value.second;
+			}
+		}
+		return empty;
 	}
     
+	void insert(K key, V value)
+	{
+		std::size_t keyhash = hash_fn(key);
+		std::cout << this << ": insert of key " << key << ", keyhash " <<keyhash << std::endl;
+        
+		if (free_entries_)
+		{
+			entry_t* new_entry = free_entries_;
+			std::cout << this << ": new entry " << new_entry << std::endl;
+			free_entries_ = free_entries_->next_entry;
+			new (new_entry) entry_t(key, value, buckets_[keyhash].first_entry);
+			buckets_[keyhash].first_entry = new_entry;
+			size_++;
+		}
+	}
+    
+	iterator begin()
+	{
+        
+	}
 public:
 	entry_t* entries_;
+	entry_t* free_entries_;
 	bucket_t* buckets_;
 	std::size_t capacity_;
 	std::size_t hashsize_;
@@ -147,11 +236,7 @@ public:
 	std::size_t size_;
 	ehash<K> hash_fn;
     
-	void swap_unwatched(ehashmap<K, T>& v)
-	{
-	}
-    
-	void clear_unwatched()
+	void swap(ehashmap<K, V>& v)
 	{
 	}
     
@@ -160,16 +245,24 @@ public:
 		capacity_ = capacity;
 		size_ = 0;
         
-		hashsize_ = 16;    // Smallest size of hash table.
+		hashsize_ = 16; // Smallest size of hash table.
 		while (hashsize_ <= capacity_)
+		{
 			hashsize_ <<= 1;
-		hashsize_ >>= 1;   // Half size is enough.
+		}
+		hashsize_ >>= 1; // Half size is enough.
 		hash_fn.mask = hashsize_ - 1;
         
 		if (capacity)
 		{
-			entries_ = (entry_t*) (new uninitialized_entry[capacity]);
-			buckets_ = (bucket_t*) (new uninitialized_bucket[hashsize_]);
+			entries_ = (entry_t *)new uninitialized_entry[capacity];
+			buckets_ = new bucket_t[hashsize_];
+			free_entries_ = entries_;
+			for (std::size_t i = 0; i < capacity - 1; ++i)
+			{
+				entries_[i].next_entry = &entries_[i + 1];
+			}
+			entries_[capacity - 1].next_entry = 0;
 		}
 		else
 		{
@@ -177,27 +270,55 @@ public:
 			buckets_ = 0;
 		}
 	}
+    
 	void destroy()
 	{
-		clear_unwatched();
+        if (buckets_)
+        {
+            for (std::size_t i = 0; i < hashsize_; ++i)
+            {
+                for (typename ehashmap<K, V>::entry_t* e = buckets_[i].first_entry; e; e = e->next_entry)
+                {
+                    e->value.~value_type();
+                }
+            }
+            delete [] buckets_;
+        }
+		delete [] (uninitialized_entry *)entries_;
 	}
 };
 
-template<typename K, typename T>
-void swap(ehashmap<K, T>& a, ehashmap<K, T>& b)
+template<typename K, typename V>
+void swap(ehashmap<K, V>& a, ehashmap<K, V>& b)
 {
 	a.swap(b);
 }
 
-template<typename K, typename T>
-std::ostream& operator<<(std::ostream& o, const ehashmap<K, T>& v)
+template<typename K, typename V>
+std::ostream& operator<<(std::ostream& o, const ehashmap<K, V>& v)
 {
-	o << std::dec << "ehashmap at " << std::hex << (void *) &v << std::dec
-    << "(size " << v.size_
-    << ", capacity " << v.capacity_
-    << ", hashsize " << v.hashsize_
-    << ", mask " << v.hash_fn.mask
-    << ")";
+	o << "ehashmap at " << std::hex << (void *) &v << std::dec << "(size "
+    << v.size_ << ", capacity " << v.capacity_ << ", hashsize "
+    << v.hashsize_ << ", mask " << v.hash_fn.mask << ")\n";
+    
+	for (std::size_t i = 0; i < v.hashsize_; ++i)
+	{
+		o << " bucket[" << i << "] entries:\n";
+		for (typename ehashmap<K, V>::entry_t* e = v.buckets_[i].first_entry; e; e
+             = e->next_entry)
+		{
+			o << "    " << e << ", key " << e->value.first << ", value " << e->value.second
+            << "\n";
+		}
+	}
+    
+	o << " free entries:";
+	for (typename ehashmap<K, V>::entry_t* e = v.free_entries_; e; e
+         = e->next_entry)
+	{
+		o << " " << e;
+	}
+	o << std::endl;
     
 	return o;
 }

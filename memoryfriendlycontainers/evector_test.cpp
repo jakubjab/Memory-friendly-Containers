@@ -25,6 +25,7 @@
 #include <ostream>
 #include <vector>
 #include <type_traits>
+#include <unistd.h>
 
 #include "mfvector.h"
 #include "object.h"
@@ -46,5 +47,13 @@ int main_evector_test()
 	assert(v2.capacity() == 4);
 	assert((v2.begin() + 1) == v2.end());
 
+    v2.push_back(object("b"));
+	assert(v2.size() == 2);
+	assert(v2.capacity() == 4);
+	assert((v2.begin() + 2) == v2.end());
+
+    object* r = v2.erase(v2.begin(), v2.begin() + 2);
+    assert(r == v2.begin());
+    
 	return 0;
 }

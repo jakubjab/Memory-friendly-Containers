@@ -24,12 +24,14 @@
 #ifndef memoryfriendlycontainers_purify_h
 #define memoryfriendlycontainers_purify_h
 
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-    int purify_watch_n(char *, unsigned int, char *);
+    int purify_watch_n(char *, size_t, char *);
     void purify_watch_remove(int);
 
 #ifdef __cplusplus
