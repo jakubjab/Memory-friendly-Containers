@@ -31,9 +31,9 @@
 #include <iterator>
 #include <ostream>
 
-template<typename K, typename V> class ehashmap;
+template<typename K, typename V> class hashmapsc;
 template<typename K, typename V> std::ostream& operator<<(std::ostream&,
-                                                          const ehashmap<K, V>& v);
+                                                          const hashmapsc<K, V>& v);
 
 template<typename V>
 struct ehash
@@ -66,11 +66,24 @@ struct ehash<int>
 	}
 };
 
+
+// Hash table using separate chaining with linked lists.
+//
+// capacity_ == 6
+//
+//              -------- -------- -------- -------- -------- --------
+// entries_ -> |        |        |        |        |        |        |
+//              -------- -------- -------- -------- -------- --------
+//
+//              -------- -------- -------- -------- -------- --------
+// buckets_ -> |        |        |        |        |        |        |
+//              -------- -------- -------- -------- -------- --------
+//
 template<typename K, typename V>
-class ehashmap
+class hashmapsc
 {
 	friend std::ostream& operator<<<K, V> (std::ostream& o,
-                                           const ehashmap<K, V>& v);
+                                           const hashmapsc<K, V>& v);
     
 public:
 	typedef K key_type;
@@ -91,7 +104,7 @@ public:
 	{
 		entry_t* first_entry;
         
-		bucket_t() : first_entry(0)
+		bucket_t() : first_entry(nullptr)
 		{}
 	};
     
@@ -120,7 +133,7 @@ public:
 		}
         
 	private:
-		ehashmap* map;
+		hashmapsc* map;
 		std::size_t bucketIx;
 		entry_t* entry;
 	};
@@ -139,13 +152,13 @@ public:
 public:
 	V empty;
     
-	explicit ehashmap(size_t capacity = 0)
+	explicit hashmapsc(size_t capacity = 0)
 	{
 		init(capacity);
 		std::cout << this << ": constructor" << std::endl;
 	}
     
-	ehashmap(const ehashmap& org)
+	hashmapsc(const hashmapsc& org)
 	{
 		if (&org != this)
 		{
@@ -155,29 +168,29 @@ public:
 		std::cout << this << ": copy constructor from " << (&org) << std::endl;
 	}
     
-	ehashmap(ehashmap&& org)
+	hashmapsc(hashmapsc&& org)
 	{
 		init();
 		swap(org);
 		std::cout << this << ": move constructor from " << (&org) << std::endl;
 	}
     
-	ehashmap& operator=(const ehashmap& org)
+	hashmapsc& operator=(const hashmapsc& org)
 	{
-		ehashmap tmp(org);
+		hashmapsc tmp(org);
 		swap(tmp);
 		std::cout << this << ": copy assignment" << std::endl;
 		return *this;
 	}
     
-	ehashmap& operator=(ehashmap&& org)
+	hashmapsc& operator=(hashmapsc&& org)
 	{
 		swap(org);
 		std::cout << this << ": move assignment from " << (&org) << std::endl;
 		return *this;
 	}
     
-	~ehashmap()
+	~hashmapsc()
 	{
 		std::cout << this << ": destructor" << std::endl;
 		destroy();
@@ -236,7 +249,7 @@ public:
 	std::size_t size_;
 	ehash<K> hash_fn;
     
-	void swap(ehashmap<K, V>& v)
+	void swap(hashmapsc<K, V>& v)
 	{
 	}
     
@@ -277,7 +290,7 @@ public:
         {
             for (std::size_t i = 0; i < hashsize_; ++i)
             {
-                for (typename ehashmap<K, V>::entry_t* e = buckets_[i].first_entry; e; e = e->next_entry)
+                for (typename hashmapsc<K, V>::entry_t* e = buckets_[i].first_entry; e; e = e->next_entry)
                 {
                     e->value.~value_type();
                 }
@@ -289,22 +302,22 @@ public:
 };
 
 template<typename K, typename V>
-void swap(ehashmap<K, V>& a, ehashmap<K, V>& b)
+void swap(hashmapsc<K, V>& a, hashmapsc<K, V>& b)
 {
 	a.swap(b);
 }
 
 template<typename K, typename V>
-std::ostream& operator<<(std::ostream& o, const ehashmap<K, V>& v)
+std::ostream& operator<<(std::ostream& o, const hashmapsc<K, V>& v)
 {
-	o << "ehashmap at " << std::hex << (void *) &v << std::dec << "(size "
+	o << "hashmapsc at " << std::hex << (void *) &v << std::dec << "(size "
     << v.size_ << ", capacity " << v.capacity_ << ", hashsize "
     << v.hashsize_ << ", mask " << v.hash_fn.mask << ")\n";
     
 	for (std::size_t i = 0; i < v.hashsize_; ++i)
 	{
 		o << " bucket[" << i << "] entries:\n";
-		for (typename ehashmap<K, V>::entry_t* e = v.buckets_[i].first_entry; e; e
+		for (typename hashmapsc<K, V>::entry_t* e = v.buckets_[i].first_entry; e; e
              = e->next_entry)
 		{
 			o << "    " << e << ", key " << e->value.first << ", value " << e->value.second
@@ -313,7 +326,7 @@ std::ostream& operator<<(std::ostream& o, const ehashmap<K, V>& v)
 	}
     
 	o << " free entries:";
-	for (typename ehashmap<K, V>::entry_t* e = v.free_entries_; e; e
+	for (typename hashmapsc<K, V>::entry_t* e = v.free_entries_; e; e
          = e->next_entry)
 	{
 		o << " " << e;

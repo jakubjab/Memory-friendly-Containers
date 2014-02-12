@@ -27,7 +27,7 @@
 #include <vector>
 #include <type_traits>
 
-#include "mfunorderedmap.h"
+#include "hashmapsc.h"
 #include "object.h"
 #include "gtest/gtest.h"
 
@@ -40,16 +40,16 @@ protected:
     
     // virtual void TearDown() {}
     
-    ehashmap<int, object> m1;
+    hashmapsc<int, object> m1;
 };
 
 TEST_F(HashmapTest, IsEmptyInitially) {
     ASSERT_EQ(0, 0);
 }
 
-int main_ehashmap_test(void)
+int main_hashmapsc_test(void)
 {
-	ehashmap<int, object> m1(100);
+	hashmapsc<int, object> m1(100);
     
 	m1.insert(3, object("a"));
 	m1.insert(50, object("b"));
@@ -73,6 +73,6 @@ int main_ehashmap_test(void)
 
 TEST(HashmapInsert, Insert)
 {
-	ehashmap<int, object> m1(100);
+	hashmapsc<int, object> m1(100);
 	m1.insert(3, object("a"));
 }

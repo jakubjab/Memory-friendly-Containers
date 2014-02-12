@@ -32,7 +32,7 @@
 /* Begin PBXFileReference section */
 		216A139418A2D5EB00C7E518 /* gtest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = gtest.framework; path = ../../googletest/fw/gtest.framework; sourceTree = "<group>"; };
 		2193916F189EEA8C004D34AE /* mfvector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mfvector.h; sourceTree = "<group>"; usesTabs = 0; wrapsLines = 0; };
-		2194F811189EE2BA00EFA84F /* mfunorderedmap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mfunorderedmap.h; sourceTree = "<group>"; };
+		2194F811189EE2BA00EFA84F /* hashmapsc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hashmapsc.h; sourceTree = "<group>"; };
 		21B903FE189ED6D800F9D4F8 /* memoryfriendlycontainers */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = memoryfriendlycontainers; sourceTree = BUILT_PRODUCTS_DIR; };
 		21B90401189ED6D800F9D4F8 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		21B90403189ED6D800F9D4F8 /* memoryfriendlycontainers.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = memoryfriendlycontainers.1; sourceTree = "<group>"; };
@@ -78,7 +78,7 @@
 			children = (
 				21B90401189ED6D800F9D4F8 /* main.cpp */,
 				21B90403189ED6D800F9D4F8 /* memoryfriendlycontainers.1 */,
-				2194F811189EE2BA00EFA84F /* mfunorderedmap.h */,
+				2194F811189EE2BA00EFA84F /* hashmapsc.h */,
 				2193916F189EEA8C004D34AE /* mfvector.h */,
 				21C1C1B118A026C900227267 /* object.h */,
 				21C1C1B218A027E300227267 /* ehashmap_test.cpp */,
