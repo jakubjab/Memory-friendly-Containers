@@ -67,41 +67,41 @@ struct ehash<int>
 };
 
 
-// Hash table using separate chaining with linked lists.
-//
-// capacity_ == 6
-// hash(A) == 0
-// hash(B) == 1
-// hash(C) == 2
-// hash(D) == 2
-//
-//              ------ ------ ------
-// buckets_ -> | 0 E0 | 1 E2 | 2 E4 |
-//              ------ ------ ------
-//                 |     |     |
-//                 |     |      -----------------------
-//                 |     |                             |
-//                 |      -----------                  |
-//                 |                 |                 |
-//                 v                 v                 v
-//                 -------- -------- -------- -------- -------- --------
-// entries_ ----> | A null |     E3 | B null |   null | C   E5 | D null |
-//                 -------- -------- -------- -------- -------- --------
-//                           ^    \            ^             \   ^
-//                           |     \          /               \ /
-//                           /      ---------
-// free_entries_ -----------/
-//
-//
+/**
+ * Hash table using separate chaining with linked lists.
+ *
+ * capacity_ == 6
+ * hash(A) == 0
+ * hash(B) == 1
+ * hash(C) == 2
+ * hash(D) == 2
+ *
+ *              ------ ------ ------
+ * buckets_ -> | 0 E0 | 1 E2 | 2 E4 |
+ *              ------ ------ ------
+ *                 |     |     |
+ *                 |     |      -----------------------
+ *                 |     |                             |
+ *                 |      -----------                  |
+ *                 |                 |                 |
+ *                 v                 v                 v
+ *                 -------- -------- -------- -------- -------- --------
+ * entries_ ----> | A null |     E3 | B null |   null | C   E5 | D null |
+ *                 -------- -------- -------- -------- -------- --------
+ *                           ^    \            ^             \   ^
+ *                           |     \          /               \ /
+ *                          /       ---------
+ * free_entries_ -----------
+ */
 template<typename K, typename V>
 class hashmapsc
 {
-	friend std::ostream& operator<<<K, V> (std::ostream& o,
-                                           const hashmapsc<K, V>& v);
+	friend std::ostream& operator<<<K, V> (std::ostream& o, const hashmapsc<K, V>& v);
     
 public:
 	typedef K key_type;
 	typedef std::pair<const K, V> value_type;
+	typedef std::pair<const K, const V> const_value_type;
 	typedef V mapped_type;
 	typedef std::size_t size_type;
     
@@ -122,14 +122,16 @@ public:
 		{}
 	};
     
-	class iterator: public std::iterator<std::forward_iterator_tag, value_type>
+	struct iter : public std::iterator<std::forward_iterator_tag, value_type>
 	{
+        iter(hashmapsc* map, std::size_t bucketIx, entry_t* entry) : map(map), bucketIx(bucketIx), entry(entry) {}
+        
 		value_type* operator->() const
 		{
 			return entry->value;
 		}
         
-		iterator& operator++()
+		iter& operator++()
 		{
 			if (entry->next_entry)
 			{
@@ -146,22 +148,20 @@ public:
 			return *this;
 		}
         
-	private:
 		hashmapsc* map;
 		std::size_t bucketIx;
 		entry_t* entry;
 	};
     
     
-	//	typedef iterator iterator;
-	//	typedef implementation-defined const_iterator;
+	typedef iter iterator;
+	typedef iter const_iterator;
+    
 	//	typedef implementation-defined local_iterator;
 	//	typedef implementation-defined const_local_iterator;
     
-	typedef typename std::aligned_storage<sizeof(entry_t),
-    std::alignment_of<entry_t>::value>::type uninitialized_entry;
-	typedef typename std::aligned_storage<sizeof(bucket_t),
-    std::alignment_of<bucket_t>::value>::type uninitialized_bucket;
+	typedef typename std::aligned_storage<sizeof(entry_t), std::alignment_of<entry_t>::value>::type uninitialized_entry;
+	typedef typename std::aligned_storage<sizeof(bucket_t), std::alignment_of<bucket_t>::value>::type uninitialized_bucket;
     
 public:
 	V empty;
@@ -251,8 +251,40 @@ public:
     
 	iterator begin()
 	{
-        
+        if (buckets_)
+        {
+            for (std::size_t i = 0; i < hashsize_; ++i)
+            {
+                if (buckets_[i].first_entry)
+                {
+                    return iterator(this, i, buckets_[i].first_entry);
+                }
+            }
+        }
+        return iterator(this, 0, nullptr);
 	}
+    const_iterator begin() const
+    {
+        return iterator(this, 0, nullptr);
+    }
+    const_iterator cbegin() const
+    {
+        return iterator(this, 0, nullptr);
+    }
+    
+	iterator end()
+	{
+        return iterator(this, 0, nullptr);
+	}
+    const_iterator end() const
+    {
+        return iterator(this, 0, nullptr);
+    }
+    const_iterator cend() const
+    {
+        return iterator(this, 0, nullptr);
+    }
+    
 public:
 	entry_t* entries_;
 	entry_t* free_entries_;
@@ -319,6 +351,18 @@ template<typename K, typename V>
 void swap(hashmapsc<K, V>& a, hashmapsc<K, V>& b)
 {
 	a.swap(b);
+}
+
+template<typename K, typename V>
+bool operator==(const typename hashmapsc<K, V>::iterator& lhs, const typename hashmapsc<K, V>::iterator& rhs)
+{
+    return (lhs.map == rhs.map && lhs.bucketIx == rhs.bucketIx && lhs.entry == rhs.entry);
+}
+
+template<typename K, typename V>
+bool operator!=(typename hashmapsc<K, V>::iterator const& lhs, typename hashmapsc<K, V>::iterator const& rhs)
+{
+    return !(lhs == rhs);
 }
 
 template<typename K, typename V>

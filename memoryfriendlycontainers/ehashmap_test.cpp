@@ -31,48 +31,63 @@
 #include "object.h"
 #include "gtest/gtest.h"
 
+//bool operator!=(hashmapsc<int, object>::iter const& lhs, hashmapsc<int, object>::iter const& rhs)
+//{
+//    return !(lhs == rhs);
+//}
+
+//bool operator==(hashmapsc<int, object>::iter const& lhs, hashmapsc<int, object>::iter const& rhs)
+//{
+//    return (lhs.map == rhs.map && lhs.bucketIx == rhs.bucketIx && lhs.entry == rhs.entry);
+//}
+
+//bool operator!=(hashmapsc<int, object>::iter<std::__1::pair<int const, object> > const&, hashmapsc<int, object>::iter<std::__1::pair<int const, object> > const&)
+//{
+//    return false;
+//}
+
+
+
 class HashmapTest : public ::testing::Test {
 protected:
-    HashmapTest() : m1(1) {
-    }
-    virtual void SetUp() {
-    }
+    HashmapTest() : m1(1), m10(10) { }
+
+    virtual void SetUp() { }
     
     // virtual void TearDown() {}
     
+    hashmapsc<int, object> m0;
     hashmapsc<int, object> m1;
+    hashmapsc<int, object> m10;
 };
 
-TEST_F(HashmapTest, IsEmptyInitially) {
-    ASSERT_EQ(0, 0);
+TEST_F(HashmapTest, Initial) {
+    EXPECT_EQ(0, m0.size());
+    EXPECT_EQ(0, m0.capacity());
+
+    EXPECT_EQ(0, m1.size());
+    EXPECT_EQ(1, m1.capacity());
 }
 
-int main_hashmapsc_test(void)
+TEST_F(HashmapTest, Insert)
 {
-	hashmapsc<int, object> m1(100);
-    
-	m1.insert(3, object("a"));
-	m1.insert(50, object("b"));
-	m1.insert(50, object("bb"));
-	m1.insert(69, object("c"));
-	m1.insert(89, object("d"));
-	m1.insert(17, object("A"));
-	m1.insert(55, object("B"));
-	m1.insert(75, object("C"));
-	m1.insert(0, object("XXX"));
-    
-	std::cout << m1 << std::endl;
-    
-	std::cout << "lookup 3: " << m1[3] << std::endl;
-	std::cout << "lookup 50: " << m1[50] << std::endl;
-	std::cout << "lookup 69: " << m1[69] << std::endl;
-	std::cout << "lookup 123: " << m1[123] << std::endl;
-    
-	return 0;
+    object a("a");
+	m1.insert(3, a);
+    EXPECT_EQ(1, m1.size());
+    EXPECT_EQ(a, m1[3]);
 }
 
-TEST(HashmapInsert, Insert)
+TEST_F(HashmapTest, Iterator)
 {
-	hashmapsc<int, object> m1(100);
-	m1.insert(3, object("a"));
+	m10.insert(1, object("A"));
+	m10.insert(2, object("B"));
+	m10.insert(3, object("C"));
+	m10.insert(4, object("D"));
+
+    std::cout << m10 << std::endl;
+
+    for (hashmapsc<int, object>::iterator i = m10.begin(), e = m10.end(); operator!=<int, object>(i, e); ++i)
+    {
+    }
 }
+

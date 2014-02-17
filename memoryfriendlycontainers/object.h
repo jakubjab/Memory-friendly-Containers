@@ -66,6 +66,16 @@ struct object
 		return *this;
 	}
     
+    bool operator==(const object& rhs) const
+    {
+        return name == rhs.name;
+    }
+
+    bool operator!=(const object& rhs) const
+    {
+        return name != rhs.name;
+    }
+    
 	~object()
 	{
 		destroy();

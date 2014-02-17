@@ -22,11 +22,13 @@
 #include <iostream>
 #include <vector>
 #include <type_traits>
+#include <unordered_map>
 
 #include "mfvector.h"
 #include "hashmapsc.h"
 #include "object.h"
 #include "gtest/gtest.h"
+#include "debugallocator.h"
 
 template<typename T>
 void type_size_alignment(const char *n)
@@ -56,9 +58,8 @@ template<class T> struct My_alloc {
 
 int main(int argc, char **argv)
 {
-    Arena my_arena1(new char[100000],100000);
-    Arena my_arena2(new char[1000000],1000000);
-
+//    Arena my_arena1(new char[100000],100000);
+//    Arena my_arena2(new char[1000000],1000000);
 //    std::vector<int,My_alloc<int>> v1(My_alloc<int>{my_arena1});
     
     
@@ -68,5 +69,10 @@ int main(int argc, char **argv)
     
 //    main_evector_test();
 //	main_ehashmap_test();
+    
+//    typedef std::unordered_map<int, int, std::hash<int>, std::equal_to<int>, DebugAllocator< std::pair<const int, int>>> mymap;
+//    typedef std::hash<int> myhash;
+//    typedef std::equal_to<int> myequal_to;
+//    mymap m(10, myhash(), myequal_to(), DebugAllocator< std::pair<const int, int>>());
 //	return 0;
 }

@@ -30,6 +30,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		213DD2CA18B14BED00D7E9B5 /* debugallocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = debugallocator.h; sourceTree = "<group>"; };
+		213DD2CB18B1514200D7E9B5 /* debugallocator2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = debugallocator2.h; sourceTree = "<group>"; };
 		216A139418A2D5EB00C7E518 /* gtest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = gtest.framework; path = ../../googletest/fw/gtest.framework; sourceTree = "<group>"; };
 		2193916F189EEA8C004D34AE /* mfvector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mfvector.h; sourceTree = "<group>"; usesTabs = 0; wrapsLines = 0; };
 		2194F811189EE2BA00EFA84F /* hashmapsc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hashmapsc.h; sourceTree = "<group>"; };
@@ -76,6 +78,8 @@
 		21B90400189ED6D800F9D4F8 /* memoryfriendlycontainers */ = {
 			isa = PBXGroup;
 			children = (
+				213DD2CA18B14BED00D7E9B5 /* debugallocator.h */,
+				213DD2CB18B1514200D7E9B5 /* debugallocator2.h */,
 				21B90401189ED6D800F9D4F8 /* main.cpp */,
 				21B90403189ED6D800F9D4F8 /* memoryfriendlycontainers.1 */,
 				2194F811189EE2BA00EFA84F /* hashmapsc.h */,
