@@ -33,46 +33,11 @@
 template<typename T>
 void type_size_alignment(const char *n)
 {
-	std::cout << "sizeof/alignment of " << n << ": " << sizeof(T) << " / "
-    << std::alignment_of<T>::value << std::endl;
+	std::cout << "sizeof/alignment of " << n << ": " << sizeof(T) << " / " << std::alignment_of<T>::value << std::endl;
 }
-
-int main_evector_test(void);
-int main_ehashmap_test(void);
-
-
-class Arena {
-    void* p;
-    int s;
-public:
-    Arena(void* pp, int ss) : p(pp), s(ss)
-    {}
-};
-
-template<class T> struct My_alloc {
-    Arena& a;
-    My_alloc(Arena& aa) : a(aa) { }
-    // usual allocator stuff
-};
-
 
 int main(int argc, char **argv)
 {
-//    Arena my_arena1(new char[100000],100000);
-//    Arena my_arena2(new char[1000000],1000000);
-//    std::vector<int,My_alloc<int>> v1(My_alloc<int>{my_arena1});
-    
-    
-    
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
-    
-//    main_evector_test();
-//	main_ehashmap_test();
-    
-//    typedef std::unordered_map<int, int, std::hash<int>, std::equal_to<int>, DebugAllocator< std::pair<const int, int>>> mymap;
-//    typedef std::hash<int> myhash;
-//    typedef std::equal_to<int> myequal_to;
-//    mymap m(10, myhash(), myequal_to(), DebugAllocator< std::pair<const int, int>>());
-//	return 0;
 }

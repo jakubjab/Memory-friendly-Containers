@@ -32,8 +32,7 @@
 #include <ostream>
 
 template<typename K, typename V> class hashmapsc;
-template<typename K, typename V> std::ostream& operator<<(std::ostream&,
-                                                          const hashmapsc<K, V>& v);
+template<typename K, typename V> std::ostream& operator<<(std::ostream&, const hashmapsc<K, V>& v);
 
 template<typename V>
 struct ehash
@@ -53,7 +52,8 @@ struct ehash<int>
     
 	std::size_t operator()(int key)
 	{
-		// This is an extremely efficient and fast hash function.
+//		return key & mask;
+        
 		std::size_t h = 0;
         
 		h += key, h += (h << 10), h ^= (h >> 6);
@@ -104,7 +104,8 @@ public:
 	typedef std::pair<const K, const V> const_value_type;
 	typedef V mapped_type;
 	typedef std::size_t size_type;
-    
+
+private:
 	struct entry_t
 	{
 		value_type value;
@@ -122,11 +123,22 @@ public:
 		{}
 	};
     
+    template<bool is_const_iterator>
 	struct iter : public std::iterator<std::forward_iterator_tag, value_type>
 	{
-        iter(hashmapsc* map, std::size_t bucketIx, entry_t* entry) : map(map), bucketIx(bucketIx), entry(entry) {}
+        typedef typename std::conditional<is_const_iterator, value_type const*, value_type*>::type pointer;
+        typedef typename std::conditional<is_const_iterator, value_type const&, value_type&>::type reference;
         
-		value_type* operator->() const
+        iter(hashmapsc* map, std::size_t bucketIx, entry_t* entry) : map(map), bucketIx(bucketIx), entry(entry) {}
+        iter(const iter<false>& other) : map(other.map), bucketIx(other.bucketIx), entry(other.entry) {}
+
+        
+		pointer operator->() const
+		{
+			return &entry->value;
+		}
+        
+		reference operator*() const
 		{
 			return entry->value;
 		}
@@ -139,37 +151,60 @@ public:
 			}
 			else
 			{
-				while (++bucketIx < map->hashsize_)
+				while (bucketIx < map->hashsize_ && !(entry = map->buckets_[++bucketIx].first_entry))
 				{
-					entry = map->buckets_[bucketIx].first_entry;
 				}
+                if (bucketIx == map->hashsize_)
+                {
+                    bucketIx = 0;
+                    entry = nullptr;
+                }
 			}
             
 			return *this;
+		}
+		iter operator++(int)
+		{
+            iter org(*this);
+            operator++();
+			return org;
 		}
         
 		hashmapsc* map;
 		std::size_t bucketIx;
 		entry_t* entry;
+        
+        friend std::ostream& operator<<(std::ostream& o, const iter& i)
+        {
+            o << "hashmapsc iterator at " << std::hex << (void *) &i << std::dec << "\n";
+            return o;
+        }
+        
+        friend bool operator==(const iter& lhs, const iter& rhs)
+        {
+            return (lhs.map == rhs.map && lhs.bucketIx == rhs.bucketIx && lhs.entry == rhs.entry);
+        }
+        
+        friend bool operator!=(const iter& lhs, const iter& rhs)
+        {
+            return !(lhs == rhs);
+        }
 	};
     
-    
-	typedef iter iterator;
-	typedef iter const_iterator;
-    
-	//	typedef implementation-defined local_iterator;
-	//	typedef implementation-defined const_local_iterator;
-    
+public:
+	typedef iter<false> iterator;
+	typedef iter<true> const_iterator;
+
+private:
 	typedef typename std::aligned_storage<sizeof(entry_t), std::alignment_of<entry_t>::value>::type uninitialized_entry;
 	typedef typename std::aligned_storage<sizeof(bucket_t), std::alignment_of<bucket_t>::value>::type uninitialized_bucket;
+	V none_;
     
 public:
-	V empty;
-    
-	explicit hashmapsc(size_t capacity = 0)
+    explicit hashmapsc(size_t capacity = 0)
 	{
 		init(capacity);
-		std::cout << this << ": constructor" << std::endl;
+//		std::cout << this << ": constructor" << std::endl;
 	}
     
 	hashmapsc(const hashmapsc& org)
@@ -179,34 +214,34 @@ public:
 			size_ = org.size_;
 			capacity_ = org.capacity_;
 		}
-		std::cout << this << ": copy constructor from " << (&org) << std::endl;
+//		std::cout << this << ": copy constructor from " << (&org) << std::endl;
 	}
     
 	hashmapsc(hashmapsc&& org)
 	{
 		init();
 		swap(org);
-		std::cout << this << ": move constructor from " << (&org) << std::endl;
+//		std::cout << this << ": move constructor from " << (&org) << std::endl;
 	}
     
 	hashmapsc& operator=(const hashmapsc& org)
 	{
 		hashmapsc tmp(org);
 		swap(tmp);
-		std::cout << this << ": copy assignment" << std::endl;
+//		std::cout << this << ": copy assignment" << std::endl;
 		return *this;
 	}
     
 	hashmapsc& operator=(hashmapsc&& org)
 	{
 		swap(org);
-		std::cout << this << ": move assignment from " << (&org) << std::endl;
+//		std::cout << this << ": move assignment from " << (&org) << std::endl;
 		return *this;
 	}
     
 	~hashmapsc()
 	{
-		std::cout << this << ": destructor" << std::endl;
+//		std::cout << this << ": destructor" << std::endl;
 		destroy();
 	}
     
@@ -230,18 +265,31 @@ public:
 				return e->value.second;
 			}
 		}
-		return empty;
+		return none_;
+	}
+    
+	V const& operator[](const K& key) const
+	{
+		std::size_t keyhash = hash_fn(key);
+		for (entry_t* e = buckets_[keyhash].first_entry; e; e = e->next_entry)
+		{
+			if (e->value.first == key)
+			{
+				return e->value.second;
+			}
+		}
+		return none_;
 	}
     
 	void insert(K key, V value)
 	{
 		std::size_t keyhash = hash_fn(key);
-		std::cout << this << ": insert of key " << key << ", keyhash " <<keyhash << std::endl;
+//		std::cout << this << ": insert of key " << key << ", keyhash " <<keyhash << std::endl;
         
 		if (free_entries_)
 		{
 			entry_t* new_entry = free_entries_;
-			std::cout << this << ": new entry " << new_entry << std::endl;
+//			std::cout << this << ": new entry " << new_entry << std::endl;
 			free_entries_ = free_entries_->next_entry;
 			new (new_entry) entry_t(key, value, buckets_[keyhash].first_entry);
 			buckets_[keyhash].first_entry = new_entry;
@@ -285,7 +333,16 @@ public:
         return iterator(this, 0, nullptr);
     }
     
-public:
+	void swap(hashmapsc<K, V>& v)
+	{
+	}
+    
+    V const& none() const
+    {
+        return none_;
+    }
+    
+private:
 	entry_t* entries_;
 	entry_t* free_entries_;
 	bucket_t* buckets_;
@@ -294,10 +351,6 @@ public:
 	std::size_t hashmask_;
 	std::size_t size_;
 	ehash<K> hash_fn;
-    
-	void swap(hashmapsc<K, V>& v)
-	{
-	}
     
 	void init(size_t capacity = 0)
 	{
@@ -351,18 +404,6 @@ template<typename K, typename V>
 void swap(hashmapsc<K, V>& a, hashmapsc<K, V>& b)
 {
 	a.swap(b);
-}
-
-template<typename K, typename V>
-bool operator==(const typename hashmapsc<K, V>::iterator& lhs, const typename hashmapsc<K, V>::iterator& rhs)
-{
-    return (lhs.map == rhs.map && lhs.bucketIx == rhs.bucketIx && lhs.entry == rhs.entry);
-}
-
-template<typename K, typename V>
-bool operator!=(typename hashmapsc<K, V>::iterator const& lhs, typename hashmapsc<K, V>::iterator const& rhs)
-{
-    return !(lhs == rhs);
 }
 
 template<typename K, typename V>

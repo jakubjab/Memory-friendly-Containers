@@ -37,32 +37,31 @@ struct object
 	object(const char *n = "unnamed")
 	{
 		init(n);
-		std::cout << *this << ": constructor" << std::endl;
+//		std::cout << *this << ": constructor" << std::endl;
 	}
 	object(const object& org)
 	{
 		name = org.name;
-		std::cout << (*this) << ": copy constructor from " << org << std::endl;
+//		std::cout << (*this) << ": copy constructor from " << org << std::endl;
 	}
 	object(object&& org)
 	{
 		init();
 		swap(org);
-		std::cout << (*this) << ": move constructor from " << org << std::endl;
+//		std::cout << (*this) << ": move constructor from " << org << std::endl;
 	}
     
 	object& operator=(const object& org)
 	{
 		object o(org);
 		swap(o);
-		std::cout << (*this) << ": copy assignment operator from " << org
-        << std::endl;
+//		std::cout << (*this) << ": copy assignment operator from " << org << std::endl;
 		return *this;
 	}
 	object& operator=(object&& org)
 	{
 		swap(org);
-		std::cout << (*this) << ": move assignment operator from " << org << std::endl;
+//		std::cout << (*this) << ": move assignment operator from " << org << std::endl;
 		return *this;
 	}
     
@@ -79,22 +78,22 @@ struct object
 	~object()
 	{
 		destroy();
-		std::cout << (*this) << ": destructor" << std::endl;
+//		std::cout << (*this) << ": destructor" << std::endl;
 	}
     
 	void init(const char *n = "unnamed")
 	{
 		name = n;
-		std::cout << (*this) << ": init" << std::endl;
+//		std::cout << (*this) << ": init" << std::endl;
 	}
 	void destroy()
 	{
-		std::cout << (*this) << ": destroy" << std::endl;
+//		std::cout << (*this) << ": destroy" << std::endl;
 	}
 	void swap(object& o)
 	{
 		name.swap(o.name);
-		std::cout << (*this) << ": swap" << std::endl;
+//		std::cout << (*this) << ": swap" << std::endl;
 	}
 };
 

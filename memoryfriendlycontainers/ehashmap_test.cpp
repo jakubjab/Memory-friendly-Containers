@@ -31,30 +31,11 @@
 #include "object.h"
 #include "gtest/gtest.h"
 
-//bool operator!=(hashmapsc<int, object>::iter const& lhs, hashmapsc<int, object>::iter const& rhs)
-//{
-//    return !(lhs == rhs);
-//}
-
-//bool operator==(hashmapsc<int, object>::iter const& lhs, hashmapsc<int, object>::iter const& rhs)
-//{
-//    return (lhs.map == rhs.map && lhs.bucketIx == rhs.bucketIx && lhs.entry == rhs.entry);
-//}
-
-//bool operator!=(hashmapsc<int, object>::iter<std::__1::pair<int const, object> > const&, hashmapsc<int, object>::iter<std::__1::pair<int const, object> > const&)
-//{
-//    return false;
-//}
-
-
 
 class HashmapTest : public ::testing::Test {
 protected:
-    HashmapTest() : m1(1), m10(10) { }
-
-    virtual void SetUp() { }
-    
-    // virtual void TearDown() {}
+    HashmapTest() : m1(1), m10(10)
+    {}
     
     hashmapsc<int, object> m0;
     hashmapsc<int, object> m1;
@@ -67,6 +48,9 @@ TEST_F(HashmapTest, Initial) {
 
     EXPECT_EQ(0, m1.size());
     EXPECT_EQ(1, m1.capacity());
+
+    EXPECT_EQ(0, m10.size());
+    EXPECT_EQ(10, m10.capacity());
 }
 
 TEST_F(HashmapTest, Insert)
@@ -79,15 +63,93 @@ TEST_F(HashmapTest, Insert)
 
 TEST_F(HashmapTest, Iterator)
 {
+	m10.insert(0, object("X"));
 	m10.insert(1, object("A"));
 	m10.insert(2, object("B"));
 	m10.insert(3, object("C"));
 	m10.insert(4, object("D"));
 
-    std::cout << m10 << std::endl;
+//    std::cout << m10 << std::endl;
 
-    for (hashmapsc<int, object>::iterator i = m10.begin(), e = m10.end(); operator!=<int, object>(i, e); ++i)
     {
+        char found[] = "00000";
+        for(hashmapsc<int, object>::iterator i = m10.begin(), e = m10.end(); i != e; ++i)
+        {
+//            std::cout << "[" << i->first << "]: " << i->second << std::endl;
+            static_assert(!std::is_const<typeof(i->second)>::value, "second is const");
+            ASSERT_LE(0, i->first);
+            ASSERT_GE(4, i->first);
+            found[i->first] = '1';
+        }
+        EXPECT_STREQ("11111", found);
+    }
+    
+    {
+        char found[] = "00000";
+        for(hashmapsc<int, object>::iterator i = m10.begin(), e = m10.end(); i != e; i++)
+        {
+//            std::cout << "[" << i->first << "]: " << i->second << std::endl;
+            static_assert(!std::is_const<typeof(i->second)>::value, "second is const");
+            ASSERT_LE(0, i->first);
+            ASSERT_GE(4, i->first);
+            found[i->first] = '1';
+        }
+        EXPECT_STREQ("11111", found);        
     }
 }
 
+TEST_F(HashmapTest, ConstIterator)
+{
+	m10.insert(0, object("X"));
+	m10.insert(1, object("A"));
+	m10.insert(2, object("B"));
+	m10.insert(3, object("C"));
+	m10.insert(4, object("D"));
+    
+//    std::cout << m10 << std::endl;
+
+    {
+        char found[] = "00000";
+        for(hashmapsc<int, object>::const_iterator i = m10.begin(), e = m10.end(); i != e; ++i)
+        {
+//          std::cout << "[" << i->first << "]: " << i->second << std::endl;
+            static_assert(std::is_const<typeof(i->second)>::value, "second is not const");
+            ASSERT_LE(0, i->first);
+            ASSERT_GE(4, i->first);
+            found[i->first] = '1';
+        }
+    }
+    {
+        char found[] = "00000";
+        for(hashmapsc<int, object>::const_iterator i = m10.begin(), e = m10.end(); i != e; i++)
+        {
+//          std::cout << "[" << i->first << "]: " << i->second << std::endl;
+            static_assert(std::is_const<typeof(i->second)>::value, "second is not const");
+            ASSERT_LE(0, i->first);
+            ASSERT_GE(4, i->first);
+            found[i->first] = '1';
+        }
+    }
+}
+
+TEST_F(HashmapTest, OperatorBrackets)
+{
+	m10.insert(1, object("A"));
+	m10.insert(2, object("B"));
+	m10.insert(3, object("C"));
+	m10.insert(4, object("D"));
+    
+    object& a = m10[1];
+    EXPECT_EQ(object("A"), a);
+
+    object const& ac = m10[1];
+    EXPECT_EQ(object("A"), ac);
+
+    EXPECT_EQ(object("B"), m10[2]);
+    EXPECT_EQ(object("C"), m10[3]);
+    EXPECT_EQ(object("D"), m10[4]);
+
+    EXPECT_EQ(m10.none(), m10[5]);
+    EXPECT_EQ(m10.none(), m10[6]);
+    EXPECT_EQ(m10.none(), m10[-1]);
+}
