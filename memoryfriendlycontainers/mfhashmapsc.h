@@ -19,8 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef memoryfriendlycontainers_mfunorderedmap_h
-#define memoryfriendlycontainers_mfunorderedmap_h
+#ifndef memoryfriendlycontainers_mfhashmapsc_h
+#define memoryfriendlycontainers_mfhashmapsc_h
 
 
 #include <algorithm>
@@ -31,11 +31,11 @@
 #include <iterator>
 #include <ostream>
 
-template<typename K, typename V> class hashmapsc;
-template<typename K, typename V> std::ostream& operator<<(std::ostream&, const hashmapsc<K, V>& v);
+template<typename K, typename V> class mfhashmapsc;
+template<typename K, typename V> std::ostream& operator<<(std::ostream&, const mfhashmapsc<K, V>& v);
 
 template<typename V>
-struct ehash
+struct mfhash
 {
 	std::size_t mask;
     
@@ -46,7 +46,7 @@ struct ehash
 };
 
 template<>
-struct ehash<int>
+struct mfhash<int>
 {
 	std::size_t mask;
     
@@ -94,9 +94,9 @@ struct ehash<int>
  * free_entries_ -----------
  */
 template<typename K, typename V>
-class hashmapsc
+class mfhashmapsc
 {
-	friend std::ostream& operator<<<K, V> (std::ostream& o, const hashmapsc<K, V>& v);
+	friend std::ostream& operator<<<K, V> (std::ostream& o, const mfhashmapsc<K, V>& v);
     
 public:
 	typedef K key_type;
@@ -129,9 +129,8 @@ private:
         typedef typename std::conditional<is_const_iterator, value_type const*, value_type*>::type pointer;
         typedef typename std::conditional<is_const_iterator, value_type const&, value_type&>::type reference;
         
-        iter(hashmapsc* map, std::size_t bucketIx, entry_t* entry) : map(map), bucketIx(bucketIx), entry(entry) {}
+        iter(mfhashmapsc* map, std::size_t bucketIx, entry_t* entry) : map(map), bucketIx(bucketIx), entry(entry) {}
         iter(const iter<false>& other) : map(other.map), bucketIx(other.bucketIx), entry(other.entry) {}
-
         
 		pointer operator->() const
 		{
@@ -170,13 +169,13 @@ private:
 			return org;
 		}
         
-		hashmapsc* map;
+		mfhashmapsc* map;
 		std::size_t bucketIx;
 		entry_t* entry;
         
         friend std::ostream& operator<<(std::ostream& o, const iter& i)
         {
-            o << "hashmapsc iterator at " << std::hex << (void *) &i << std::dec << "\n";
+            o << "mfhashmapsc iterator at " << std::hex << (void *) &i << std::dec << "\n";
             return o;
         }
         
@@ -198,16 +197,18 @@ public:
 private:
 	typedef typename std::aligned_storage<sizeof(entry_t), std::alignment_of<entry_t>::value>::type uninitialized_entry;
 	typedef typename std::aligned_storage<sizeof(bucket_t), std::alignment_of<bucket_t>::value>::type uninitialized_bucket;
+    
+    /** Value returned from different functions in case of error. */
 	V none_;
     
 public:
-    explicit hashmapsc(size_t capacity = 0)
+    explicit mfhashmapsc(size_t capacity = 0)
 	{
 		init(capacity);
 //		std::cout << this << ": constructor" << std::endl;
 	}
     
-	hashmapsc(const hashmapsc& org)
+	mfhashmapsc(const mfhashmapsc& org)
 	{
 		if (&org != this)
 		{
@@ -217,29 +218,29 @@ public:
 //		std::cout << this << ": copy constructor from " << (&org) << std::endl;
 	}
     
-	hashmapsc(hashmapsc&& org)
+	mfhashmapsc(mfhashmapsc&& org)
 	{
 		init();
 		swap(org);
 //		std::cout << this << ": move constructor from " << (&org) << std::endl;
 	}
     
-	hashmapsc& operator=(const hashmapsc& org)
+	mfhashmapsc& operator=(const mfhashmapsc& org)
 	{
-		hashmapsc tmp(org);
+		mfhashmapsc tmp(org);
 		swap(tmp);
 //		std::cout << this << ": copy assignment" << std::endl;
 		return *this;
 	}
     
-	hashmapsc& operator=(hashmapsc&& org)
+	mfhashmapsc& operator=(mfhashmapsc&& org)
 	{
 		swap(org);
 //		std::cout << this << ": move assignment from " << (&org) << std::endl;
 		return *this;
 	}
     
-	~hashmapsc()
+	~mfhashmapsc()
 	{
 //		std::cout << this << ": destructor" << std::endl;
 		destroy();
@@ -333,7 +334,7 @@ public:
         return iterator(this, 0, nullptr);
     }
     
-	void swap(hashmapsc<K, V>& v)
+	void swap(mfhashmapsc<K, V>& v)
 	{
 	}
     
@@ -350,7 +351,7 @@ private:
 	std::size_t hashsize_;
 	std::size_t hashmask_;
 	std::size_t size_;
-	ehash<K> hash_fn;
+	mfhash<K> hash_fn;
     
 	void init(size_t capacity = 0)
 	{
@@ -389,7 +390,7 @@ private:
         {
             for (std::size_t i = 0; i < hashsize_; ++i)
             {
-                for (typename hashmapsc<K, V>::entry_t* e = buckets_[i].first_entry; e; e = e->next_entry)
+                for (typename mfhashmapsc<K, V>::entry_t* e = buckets_[i].first_entry; e; e = e->next_entry)
                 {
                     e->value.~value_type();
                 }
@@ -401,22 +402,22 @@ private:
 };
 
 template<typename K, typename V>
-void swap(hashmapsc<K, V>& a, hashmapsc<K, V>& b)
+void swap(mfhashmapsc<K, V>& a, mfhashmapsc<K, V>& b)
 {
 	a.swap(b);
 }
 
 template<typename K, typename V>
-std::ostream& operator<<(std::ostream& o, const hashmapsc<K, V>& v)
+std::ostream& operator<<(std::ostream& o, const mfhashmapsc<K, V>& v)
 {
-	o << "hashmapsc at " << std::hex << (void *) &v << std::dec << "(size "
+	o << "mfhashmapsc at " << std::hex << (void *) &v << std::dec << "(size "
     << v.size_ << ", capacity " << v.capacity_ << ", hashsize "
     << v.hashsize_ << ", mask " << v.hash_fn.mask << ")\n";
     
 	for (std::size_t i = 0; i < v.hashsize_; ++i)
 	{
 		o << " bucket[" << i << "] entries:\n";
-		for (typename hashmapsc<K, V>::entry_t* e = v.buckets_[i].first_entry; e; e
+		for (typename mfhashmapsc<K, V>::entry_t* e = v.buckets_[i].first_entry; e; e
              = e->next_entry)
 		{
 			o << "    " << e << ", key " << e->value.first << ", value " << e->value.second
@@ -425,7 +426,7 @@ std::ostream& operator<<(std::ostream& o, const hashmapsc<K, V>& v)
 	}
     
 	o << " free entries:";
-	for (typename hashmapsc<K, V>::entry_t* e = v.free_entries_; e; e
+	for (typename mfhashmapsc<K, V>::entry_t* e = v.free_entries_; e; e
          = e->next_entry)
 	{
 		o << " " << e;

@@ -27,7 +27,7 @@
 #include <vector>
 #include <type_traits>
 
-#include "hashmapsc.h"
+#include "mfhashmapsc.h"
 #include "object.h"
 #include "gtest/gtest.h"
 
@@ -37,9 +37,9 @@ protected:
     HashmapTest() : m1(1), m10(10)
     {}
     
-    hashmapsc<int, object> m0;
-    hashmapsc<int, object> m1;
-    hashmapsc<int, object> m10;
+    mfhashmapsc<int, object> m0;
+    mfhashmapsc<int, object> m1;
+    mfhashmapsc<int, object> m10;
 };
 
 TEST_F(HashmapTest, Initial) {
@@ -73,7 +73,7 @@ TEST_F(HashmapTest, Iterator)
 
     {
         char found[] = "00000";
-        for(hashmapsc<int, object>::iterator i = m10.begin(), e = m10.end(); i != e; ++i)
+        for(mfhashmapsc<int, object>::iterator i = m10.begin(), e = m10.end(); i != e; ++i)
         {
 //            std::cout << "[" << i->first << "]: " << i->second << std::endl;
             static_assert(!std::is_const<typeof(i->second)>::value, "second is const");
@@ -86,7 +86,7 @@ TEST_F(HashmapTest, Iterator)
     
     {
         char found[] = "00000";
-        for(hashmapsc<int, object>::iterator i = m10.begin(), e = m10.end(); i != e; i++)
+        for(mfhashmapsc<int, object>::iterator i = m10.begin(), e = m10.end(); i != e; i++)
         {
 //            std::cout << "[" << i->first << "]: " << i->second << std::endl;
             static_assert(!std::is_const<typeof(i->second)>::value, "second is const");
@@ -110,7 +110,7 @@ TEST_F(HashmapTest, ConstIterator)
 
     {
         char found[] = "00000";
-        for(hashmapsc<int, object>::const_iterator i = m10.begin(), e = m10.end(); i != e; ++i)
+        for(mfhashmapsc<int, object>::const_iterator i = m10.begin(), e = m10.end(); i != e; ++i)
         {
 //          std::cout << "[" << i->first << "]: " << i->second << std::endl;
             static_assert(std::is_const<typeof(i->second)>::value, "second is not const");
@@ -121,7 +121,7 @@ TEST_F(HashmapTest, ConstIterator)
     }
     {
         char found[] = "00000";
-        for(hashmapsc<int, object>::const_iterator i = m10.begin(), e = m10.end(); i != e; i++)
+        for(mfhashmapsc<int, object>::const_iterator i = m10.begin(), e = m10.end(); i != e; i++)
         {
 //          std::cout << "[" << i->first << "]: " << i->second << std::endl;
             static_assert(std::is_const<typeof(i->second)>::value, "second is not const");
@@ -152,4 +152,15 @@ TEST_F(HashmapTest, OperatorBrackets)
     EXPECT_EQ(m10.none(), m10[5]);
     EXPECT_EQ(m10.none(), m10[6]);
     EXPECT_EQ(m10.none(), m10[-1]);
+}
+
+TEST_F(HashmapTest, Swap)
+{
+    swap(m1, m10);
+
+//    EXPECT_EQ(0, m10.size());
+//    EXPECT_EQ(1, m10.capacity());
+    
+//    EXPECT_EQ(0, m1.size());
+//    EXPECT_EQ(10, m1.capacity());
 }

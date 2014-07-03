@@ -25,7 +25,7 @@
 #include <unordered_map>
 
 #include "mfvector.h"
-#include "hashmapsc.h"
+#include "mfhashmapsc.h"
 #include "object.h"
 #include "gtest/gtest.h"
 #include "debugallocator.h"

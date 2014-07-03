@@ -31,24 +31,24 @@
 
 #include "purify.h"
 
-template<typename T> class evector;
+template<typename T> class mfvector;
 template<typename T> std::ostream& operator<<(std::ostream&,
-                                              const evector<T>& v);
+                                              const mfvector<T>& v);
 
 template<typename T>
-class evector {
-	friend std::ostream& operator<<<T> (std::ostream& o, const evector<T>& v);
+class mfvector {
+	friend std::ostream& operator<<<T> (std::ostream& o, const mfvector<T>& v);
     
 	typedef typename std::aligned_storage<sizeof(T), std::alignment_of<T>::value>::type uninitialized_T;
 public:
-	explicit evector(size_t capacity = 0)
+	explicit mfvector(size_t capacity = 0)
 	{
 		init(capacity);
 		start_watch();
 		std::cout << this << ": constructor" << std::endl;
 	}
     
-	evector(const evector& org)
+	mfvector(const mfvector& org)
 	{
 		if (&org != this) {
 			size_ = org.size_;
@@ -64,7 +64,7 @@ public:
 		std::cout << this << ": copy constructor from " << (&org) << std::endl;
 	}
     
-	evector(evector&& org)
+	mfvector(mfvector&& org)
 	{
 		init();
 		swap_unwatched(org);
@@ -72,17 +72,17 @@ public:
 		std::cout << this << ": move constructor from " << (&org) << std::endl;
 	}
     
-	evector& operator=(const evector& org)
+	mfvector& operator=(const mfvector& org)
 	{
 		stop_watch();
-		evector tmp(org);
+		mfvector tmp(org);
 		swap_unwatched(tmp);
 		std::cout << this << ": copy assignment" << std::endl;
 		start_watch();
 		return *this;
 	}
     
-	evector& operator=(evector&& org)
+	mfvector& operator=(mfvector&& org)
 	{
 		stop_watch();
 		swap_unwatched(org);
@@ -91,7 +91,7 @@ public:
 		return *this;
 	}
     
-	~evector()
+	~mfvector()
 	{
 		std::cout << this << ": destructor" << std::endl;
 		stop_watch();
@@ -130,11 +130,11 @@ public:
     
 	void push_back(const T& x)
 	{
-		std::cout << "evector::push_back(const T& x)\n";
+		std::cout << "mfvector::push_back(const T& x)\n";
 		if (size_ < capacity_)
 		{
 			stop_watch();
-			std::cout << "evector::push_back(const T& x), adding at " << &data_[size_] << "-----------------------\n";
+			std::cout << "mfvector::push_back(const T& x), adding at " << &data_[size_] << "-----------------------\n";
 			new (&data_[size_++]) T(x);
 			start_watch();
 		}
@@ -142,12 +142,12 @@ public:
     
 	void push_back(T&& x)
 	{
-		std::cout << "evector::push_back(T&& x)\n";
+		std::cout << "mfvector::push_back(T&& x)\n";
 		if (size_ < capacity_)
 		{
 			stop_watch();
-			std::cout << "evector::push_back(T&& x), adding at " << &data_[size_] << "-----------------------\n";
-//			new (&data_[size_++]) T(std::move(x));
+			std::cout << "mfvector::push_back(T&& x), adding at " << &data_[size_] << "-----------------------\n";
+			new (&data_[size_++]) T(std::move(x));
 			start_watch();
 		}
 	}
@@ -162,7 +162,7 @@ public:
 		return data_[n];
 	}
     
-	void swap(evector<T>& v)
+	void swap(mfvector<T>& v)
 	{
 		stop_watch();
 		v.stop_watch();
@@ -210,7 +210,7 @@ public:
 	std::size_t size_;
 	int watch;
     
-	void swap_unwatched(evector<T>& v)
+	void swap_unwatched(mfvector<T>& v)
 	{
 		std::swap(capacity_, v.capacity_);
 		std::swap(size_, v.size_);
@@ -266,15 +266,15 @@ public:
 };
 
 template<typename T>
-void swap(evector<T>& a, evector<T>& b)
+void swap(mfvector<T>& a, mfvector<T>& b)
 {
 	a.swap(b);
 }
 
 template<typename T>
-std::ostream& operator<<(std::ostream& o, const evector<T>& v)
+std::ostream& operator<<(std::ostream& o, const mfvector<T>& v)
 {
-	o << std::dec << "evector at " << std::hex << (void *) &v << std::dec
+	o << std::dec << "mfvector at " << std::hex << (void *) &v << std::dec
     << "(size " << v.size_ << ", capacity " << v.capacity_ << ", data "
     << std::hex << v.data_ << " [" << std::dec;
 //	std::copy(v.begin(), v.end(), std::ostream_iterator<T>(o, ", "));
