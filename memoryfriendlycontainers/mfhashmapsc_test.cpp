@@ -156,11 +156,14 @@ TEST_F(HashmapTest, OperatorBrackets)
 
 TEST_F(HashmapTest, Swap)
 {
+    m10.insert(123, object("abc"));
+    m10.insert(456, object("def"));
+
     swap(m1, m10);
 
-//    EXPECT_EQ(0, m10.size());
-//    EXPECT_EQ(1, m10.capacity());
+    EXPECT_EQ(0, m10.size());
+    EXPECT_EQ(1, m10.capacity());
     
-//    EXPECT_EQ(0, m1.size());
-//    EXPECT_EQ(10, m1.capacity());
+    EXPECT_EQ(2, m1.size());
+    EXPECT_EQ(10, m1.capacity());
 }

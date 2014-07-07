@@ -198,9 +198,6 @@ private:
 	typedef typename std::aligned_storage<sizeof(entry_t), std::alignment_of<entry_t>::value>::type uninitialized_entry;
 	typedef typename std::aligned_storage<sizeof(bucket_t), std::alignment_of<bucket_t>::value>::type uninitialized_bucket;
     
-    /** Value returned from different functions in case of error. */
-	V none_;
-    
 public:
     explicit mfhashmapsc(size_t capacity = 0)
 	{
@@ -336,6 +333,15 @@ public:
     
 	void swap(mfhashmapsc<K, V>& v)
 	{
+        std::swap(entries_, v.entries_);
+        std::swap(free_entries_, v.free_entries_);
+        std::swap(buckets_, v.buckets_);
+        std::swap(capacity_, v.capacity_);
+        std::swap(hashsize_, v.hashsize_);
+        std::swap(hashmask_, v.hashmask_);
+        std::swap(size_, v.size_);
+        std::swap(hash_fn, v.hash_fn);
+        std::swap(none_, v.none_);
 	}
     
     V const& none() const
@@ -352,6 +358,9 @@ private:
 	std::size_t hashmask_;
 	std::size_t size_;
 	mfhash<K> hash_fn;
+
+    /** Value returned from different functions in case of error. */
+	V none_;
     
 	void init(size_t capacity = 0)
 	{
